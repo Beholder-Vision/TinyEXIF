@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.1)
 project(TinyEXIF)
 include(GNUInstallDirs)
 
-find_package(tinyxml2 REQUIRED)
-
 #CMAKE_BUILD_TOOL
 
 ################################
@@ -31,6 +29,11 @@ option(BUILD_SHARED_LIBS "build as shared library" ON)
 option(BUILD_STATIC_LIBS "build as static library" OFF)
 option(LINK_CRT_STATIC_LIBS "link CRT static library" OFF)
 option(BUILD_DEMO "build demo binary" ON)
+option(ENABLE_XMP_SUPPORT "build with XMP support using TinyXML2" ON)
+
+if(ENABLE_XMP_SUPPORT)
+	find_package(tinyxml2 REQUIRED)
+endif()
 
 # set MSVC runtime linkage to static or dynamic
 # as in: https://stackoverflow.com/questions/10113017/setting-the-msvc-runtime-in-cmake
@@ -84,7 +87,12 @@ if(BUILD_SHARED_LIBS)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4251") # needs to have dll-interface
 	endif()
 
-	target_link_libraries(TinyEXIF tinyxml2::tinyxml2)
+	if(ENABLE_XMP_SUPPORT)
+		target_link_libraries(TinyEXIF tinyxml2::tinyxml2)
+	else()
+		target_compile_definitions(TinyEXIFstatic PUBLIC TINYEXIF_NO_XMP_SUPPORT)
+	endif()
+
 	set_target_properties(TinyEXIF PROPERTIES
 		COMPILE_DEFINITIONS "TINYEXIF_EXPORT"
 		VERSION "${GENERIC_LIB_VERSION}"
@@ -121,7 +129,12 @@ endif()
 if(BUILD_STATIC_LIBS)
 	add_library(TinyEXIFstatic STATIC TinyEXIF.cpp TinyEXIF.h)
 	
-	target_link_libraries(TinyEXIFstatic tinyxml2::tinyxml2)
+	if(ENABLE_XMP_SUPPORT)
+		target_link_libraries(TinyEXIFstatic tinyxml2::tinyxml2)
+	else()
+		target_compile_definitions(TinyEXIFstatic PUBLIC TINYEXIF_NO_XMP_SUPPORT)
+	endif()
+
 	set_target_properties(TinyEXIFstatic PROPERTIES
 			OUTPUT_NAME TinyEXIF
 			VERSION "${GENERIC_LIB_VERSION}"
@@ -162,7 +175,10 @@ if(BUILD_DEMO)
 		target_compile_definitions(TinyEXIFdemo PRIVATE TINYEXIF_IMPORT)
 	else(BUILD_STATIC_LIBS)
 		add_dependencies(TinyEXIFdemo TinyEXIFstatic)
-		target_link_libraries(TinyEXIFdemo TinyEXIFstatic tinyxml2::tinyxml2)
+		target_link_libraries(TinyEXIFdemo TinyEXIFstatic)
+		if(ENABLE_XMP_SUPPORT)
+			target_link_libraries(TinyEXIFdemo tinyxml2::tinyxml2)
+		endif()
 	endif()
 endif()
 
