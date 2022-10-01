@@ -87,17 +87,16 @@ if(BUILD_SHARED_LIBS)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4251") # needs to have dll-interface
 	endif()
 
-	if(ENABLE_XMP_SUPPORT)
-		target_link_libraries(TinyEXIF tinyxml2::tinyxml2)
-	else()
-		target_compile_definitions(TinyEXIF PUBLIC TINYEXIF_NO_XMP_SUPPORT)
-	endif()
-
 	set_target_properties(TinyEXIF PROPERTIES
 		COMPILE_DEFINITIONS "TINYEXIF_EXPORT"
 		VERSION "${GENERIC_LIB_VERSION}"
 		SOVERSION "${GENERIC_LIB_SOVERSION}")
 
+	if(ENABLE_XMP_SUPPORT)
+		target_link_libraries(TinyEXIF tinyxml2::tinyxml2)
+	else()
+		target_compile_definitions(TinyEXIF PUBLIC TINYEXIF_NO_XMP_SUPPORT)
+	endif()
 
 	if(DEFINED CMAKE_VERSION AND NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.11")
 		target_include_directories(TinyEXIF PUBLIC 
@@ -128,17 +127,17 @@ endif()
 
 if(BUILD_STATIC_LIBS)
 	add_library(TinyEXIFstatic STATIC TinyEXIF.cpp TinyEXIF.h)
-	
-	if(ENABLE_XMP_SUPPORT)
-		target_link_libraries(TinyEXIFstatic tinyxml2::tinyxml2)
-	else()
-		target_compile_definitions(TinyEXIFstatic PUBLIC TINYEXIF_NO_XMP_SUPPORT)
-	endif()
 
 	set_target_properties(TinyEXIFstatic PROPERTIES
 			OUTPUT_NAME TinyEXIF
 			VERSION "${GENERIC_LIB_VERSION}"
 			SOVERSION "${GENERIC_LIB_SOVERSION}")
+
+	if(ENABLE_XMP_SUPPORT)
+		target_link_libraries(TinyEXIFstatic tinyxml2::tinyxml2)
+	else()
+		target_compile_definitions(TinyEXIFstatic PUBLIC TINYEXIF_NO_XMP_SUPPORT)
+	endif()
 
 	if(DEFINED CMAKE_VERSION AND NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.11")
 		target_include_directories(TinyEXIFstatic PUBLIC 
