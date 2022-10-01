@@ -90,7 +90,7 @@ if(BUILD_SHARED_LIBS)
 	if(ENABLE_XMP_SUPPORT)
 		target_link_libraries(TinyEXIF tinyxml2::tinyxml2)
 	else()
-		target_compile_definitions(TinyEXIFstatic PUBLIC TINYEXIF_NO_XMP_SUPPORT)
+		target_compile_definitions(TinyEXIF PUBLIC TINYEXIF_NO_XMP_SUPPORT)
 	endif()
 
 	set_target_properties(TinyEXIF PROPERTIES
